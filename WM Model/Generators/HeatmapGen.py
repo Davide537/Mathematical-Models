@@ -1,4 +1,4 @@
-import BaseModel as bm
+import Generators.BaseModel as bm
 import contextlib
 import os
 from itertools import product

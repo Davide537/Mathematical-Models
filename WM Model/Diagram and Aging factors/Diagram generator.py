@@ -92,10 +92,12 @@ arrows_svg = "\n  ".join(arrow(*a) for a in ARROWS)
 
 # (cx, cy, rx, ry, colour, side) side: -1 = loop on left of ellipse, +1 = right
 RECURRENT = [
-    (672, 150, 120, 102, BLUE, -1, AREA_SUBS[0]),
-    (680, 718, 118, 100, ORANGE, -1, AREA_SUBS[0]),
-    (1349, 140, 119, 102, BLUE, +1, AREA_SUBS[1]),
+    (672, 150, 119, 98, BLUE, -1, AREA_SUBS[0]),
+    (680, 718, 119, 98, ORANGE, -1, AREA_SUBS[0]),
+    (1349, 140, 119, 98, BLUE, +1, AREA_SUBS[1]),
     (1360, 712, 119, 98, ORANGE, +1, AREA_SUBS[1]),
+    (695, 430, 119, 98, INHIB, -1, '2'),
+    (1315, 430, 119, 98, INHIB, +1, None)
 ]
 
 def recurrent(cx, cy, rx, ry, color, side,sub):
@@ -116,15 +118,15 @@ def recurrent(cx, cy, rx, ry, color, side,sub):
     path = (f'<path d="M {p0[0]:.1f},{p0[1]:.1f} A {R},{R} 0 1 {sweep} {p1[0]:.1f},{p1[1]:.1f}" '
             f'fill="none" stroke="{color}" stroke-width="{RECUR_W}"/>')
     head = f'<polygon points="{b1[0]:.1f},{b1[1]:.1f} {b2[0]:.1f},{b2[1]:.1f} {tx:.1f},{ty:.1f}" fill="{color}"/>'
-    label = (f'<text x="{ccx:.1f}" y="{cy + LABEL_SIZE * 0.3:.1f}" text-anchor="middle" font-size="{LABEL_SIZE}" '
+    if color != INHIB:
+      label = (f'<text x="{ccx:.1f}" y="{cy + LABEL_SIZE * 0.3:.1f}" text-anchor="middle" font-size="{LABEL_SIZE}" '
              f'font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="{LABEL_SIZE*0.65:.0f}" dy="6">{sub}</tspan></text>')
+    else: label=''
+
     return "\n  ".join([path, head, label])
 
 recurrent_svg = "\n  ".join(recurrent(*r) for r in RECURRENT)
 
-# TODO inh recurrent connection
-# TODO make colors of exc mathc the plot color
-# TODO 
 
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -60 1640 940" width="1640" height="940" font-family="Arial, Helvetica, sans-serif">
   <rect x="0" y="-60" width="1640" height="940" fill="#ffffff"/>

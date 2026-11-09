@@ -47,18 +47,24 @@
   <rect x="1310" y="262" width="12" height="130" fill="#8c8c8c"/><circle cx="1316" cy="266" r="25" fill="#8c8c8c"/>
   <rect x="1306" y="472" width="12" height="110" fill="#8c8c8c"/><circle cx="1311" cy="586" r="25" fill="#8c8c8c"/>
     <!-- recurrent J_s loops -->
-  <path d="M 561.5,110.2 A 52,52 0 1 0 561.5,189.8" fill="none" stroke="#1f77b4" stroke-width="12"/>
-  <polygon points="573.7,204.4 549.3,175.3 543.1,205.3" fill="#1f77b4"/>
-  <text x="528.1" y="162.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">i</tspan></text>
-  <path d="M 571.8,678.2 A 52,52 0 1 0 571.8,757.8" fill="none" stroke="#ff7f0e" stroke-width="12"/>
-  <polygon points="584.0,772.4 559.6,743.3 553.4,773.3" fill="#ff7f0e"/>
-  <text x="538.3" y="730.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">i</tspan></text>
-  <path d="M 1458.6,100.2 A 52,52 0 1 1 1458.6,179.8" fill="none" stroke="#1f77b4" stroke-width="12"/>
-  <polygon points="1470.8,165.3 1446.3,194.4 1476.9,195.3" fill="#1f77b4"/>
-  <text x="1492.0" y="152.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">j</tspan></text>
+  <path d="M 563.3,110.2 A 52,52 0 1 0 563.3,189.8" fill="none" stroke="#1f77b4" stroke-width="12"/>
+  <polygon points="575.5,204.4 551.1,175.3 544.9,205.3" fill="#1f77b4"/>
+  <text x="529.8" y="162.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">i</tspan></text>
+  <path d="M 571.3,678.2 A 52,52 0 1 0 571.3,757.8" fill="none" stroke="#ff7f0e" stroke-width="12"/>
+  <polygon points="583.5,772.4 559.1,743.3 552.9,773.3" fill="#ff7f0e"/>
+  <text x="537.8" y="730.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">i</tspan></text>
+  <path d="M 1457.7,100.2 A 52,52 0 1 1 1457.7,179.8" fill="none" stroke="#1f77b4" stroke-width="12"/>
+  <polygon points="1469.9,165.3 1445.5,194.4 1476.1,195.3" fill="#1f77b4"/>
+  <text x="1491.2" y="152.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">j</tspan></text>
   <path d="M 1468.7,672.2 A 52,52 0 1 1 1468.7,751.8" fill="none" stroke="#ff7f0e" stroke-width="12"/>
   <polygon points="1480.9,737.3 1456.5,766.4 1487.1,767.3" fill="#ff7f0e"/>
   <text x="1502.2" y="724.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">j</tspan></text>
+  <path d="M 586.3,390.2 A 52,52 0 1 0 586.3,469.8" fill="none" stroke="#8c8c8c" stroke-width="12"/>
+  <polygon points="598.5,484.4 574.1,455.3 567.9,485.3" fill="#8c8c8c"/>
+  
+  <path d="M 1423.7,390.2 A 52,52 0 1 1 1423.7,469.8" fill="none" stroke="#8c8c8c" stroke-width="12"/>
+  <polygon points="1435.9,455.3 1411.5,484.4 1442.1,485.3" fill="#8c8c8c"/>
+  
     <!-- area labels -->
   <g font-weight="bold" font-size="44" fill="#000" text-anchor="middle">
     <text x="675" y="-14">Area i</text>

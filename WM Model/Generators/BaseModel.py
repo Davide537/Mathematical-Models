@@ -293,38 +293,7 @@ class BuildModel:
         W_I_eff = mu_IE * LR_IE_gradient[:, np.newaxis] * W_I 
 
         if 'longrange' in aging_mechanism:
-            loss_by_age = {'Y': 0.0, 'MA': 0.10, 'A': 0.20}
-            try:
-                scale = 1.0 - loss_by_age[age]
-            except KeyError:
-                raise ValueError(f"Unknown age: {age}")
-
-            # Each bundle: (source_areas, target_areas) — applied bidirectionally
-            bundles = [
-                # SLF II: parietal <-> frontal/prefrontal
-                (idx(['7A','LIP','DP','7B']),
-                idx(['46d','9/46d','8l','8m','8b','F2','F7'])),
-                # Cingulum bundle
-                (idx(['10','9/46v','8m','24c']),
-                idx(['7m'])),
-                # SLF III
-                (idx(['7B','STPc','STPi']),
-                idx(['F5','8l','9/46v','ProM'])),
-                # Uncinate fasciculus
-                (idx(['10']),
-                idx(['STPr','PBr'])),
-                # Fronto-cingulate
-                (idx(['24c']),
-                idx(['F1','F2','F7','8m'])),
-            ]
-            for src, tgt in bundles:
-                # src -> tgt
-                W_E_eff[np.ix_(tgt, src)] *= scale
-                W_I_eff[np.ix_(tgt, src)] *= scale
-                # tgt -> src (bidirectional)
-                W_E_eff[np.ix_(src, tgt)] *= scale
-                W_I_eff[np.ix_(src, tgt)] *= scale
-
+            # affects both excitatory and inhibitory , TODO?
             D_by_age = {
                 'Y': np.ones_like(self.hierarchy),
                 'MA': 0.825 - 0.009 * np.arange(self.num_areas),
@@ -336,7 +305,6 @@ class BuildModel:
             except KeyError:
                 raise ValueError(f"Unknown age: {age}")
 
-            # D = D[np.argsort(self.hierarchy)]
             W_E_eff *= D[:, np.newaxis]
             W_I_eff *= D[:, np.newaxis]
 

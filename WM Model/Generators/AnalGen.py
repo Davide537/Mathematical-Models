@@ -4,7 +4,7 @@ import scipy.optimize
 from matplotlib.lines import Line2D
 from scipy.optimize import brentq
 from tqdm import tqdm
-import BaseModel as bm
+import Generators.BaseModel as bm
 
 
 def phi_E(I, a_E, b_E, d_E):
@@ -278,3 +278,19 @@ class Analytical_Search(bm.BuildModel):
 
         return S, R
 
+def run_regime(age, j_max, G, aging_mechanism):
+    Setup = Analytical_Search(aging_mechanism=aging_mechanism, age=age, G=G, J_max=j_max)
+    S, R = Setup.fixedpoint_computation_all()
+    return {'J_max': j_max, 'G': G, 'val': len(S), 'age': age, 'R': R}
+
+def grid_gen(mech={'FI', 'spine'}):
+    ages    = ['Y', 'MA', 'A']
+    j_maxes = [round(i * 0.01 + 0.21, 2) for i in range(31)]
+    Gs      = [round(j * 0.02 + 0.2,  2) for j in range(16)]
+    tasks = list(product(ages, j_maxes, Gs))
+
+    rows = Parallel(n_jobs=-2, verbose=10, backend='loky')(
+        delayed(run_regime)(age, j_max, G, mech)
+        for age, j_max, G in tasks)
+
+    return pd.DataFrame(rows)
