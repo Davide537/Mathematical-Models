@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -60 1640 940" width="1640" height="940" font-family="Arial, Helvetica, sans-serif">
+  <rect x="0" y="-60" width="1640" height="940" fill="#ffffff"/>
+  <rect x="432" y="10" width="487" height="848" rx="40" ry="40" fill="#d6c0a6"/>
+  <rect x="464" y="42" width="421" height="784" rx="24" ry="24" fill="#fde5cb"/>
+  <rect x="1100" y="4" width="497" height="844" rx="40" ry="40" fill="#d6c0a6"/>
+  <rect x="1132" y="38" width="431" height="778" rx="24" ry="24" fill="#fde5cb"/>
+  <g font-weight="bold" font-size="76" fill="#000">
+    <text x="78" y="205">Excit. E1</text>
+    <text x="78" y="460">Inhib. IN</text>
+    <text x="78" y="742">Excit. E2</text>
+  </g>
+  <!-- populations -->
+  <ellipse cx="672" cy="150" rx="120" ry="102" fill="#8fbbd9"/><ellipse cx="672" cy="150" rx="88" ry="76" fill="#1f77b4"/>
+  <ellipse cx="680" cy="718" rx="118" ry="100" fill="#ffbf86"/><ellipse cx="680" cy="718" rx="87" ry="76" fill="#ff7f0e"/>
+  <ellipse cx="1349" cy="140" rx="119" ry="102" fill="#8fbbd9"/><ellipse cx="1349" cy="140" rx="88" ry="76" fill="#1f77b4"/>
+  <ellipse cx="1360" cy="712" rx="119" ry="98" fill="#ffbf86"/><ellipse cx="1360" cy="712" rx="88" ry="76" fill="#ff7f0e"/>
+  <ellipse cx="664" cy="438" rx="94" ry="88" fill="#bdbdc0"/><ellipse cx="664" cy="438" rx="62" ry="58" fill="#8c8c8c"/>
+  <ellipse cx="1343" cy="432" rx="94" ry="86" fill="#bdbdc0"/><ellipse cx="1343" cy="432" rx="62" ry="58" fill="#8c8c8c"/>
+  <!-- excitatory arrows -->
+  <polygon points="725.0,124.0 725.0,104.0 1222.0,102.0 1222.0,122.0" fill="#1f77b4"/>
+  <polygon points="1222.1,148.0 1221.9,76.0 1174.0,112.2" fill="#1f77b4"/>
+  <polygon points="1286.5,180.6 1293.5,199.4 767.5,397.4 760.5,378.6" fill="#1f77b4"/>
+  <polygon points="751.3,354.3 776.7,421.7 808.9,371.1" fill="#1f77b4"/>
+  <line x1="1265" y1="160" x2="797.0" y2="149.0" stroke="#1f77b4" stroke-width="2.5" stroke-dasharray="5,4"/>
+  <polygon points="797.4,134.0 796.6,164.0 827.0,149.7" fill="#1f77b4"/>
+  <line x1="750" y1="188" x2="1232.0" y2="376.0" stroke="#1f77b4" stroke-width="2.5" stroke-dasharray="5,4"/>
+  <polygon points="1226.5,390.0 1237.5,362.0 1204.1,365.1" fill="#1f77b4"/>
+  <polygon points="697.0,190.0 717.0,190.0 717.0,345.0 697.0,345.0" fill="#1f77b4"/>
+  <polygon points="673.0,345.0 741.0,345.0 707.0,297.0" fill="#1f77b4"/>
+  <polygon points="1376.0,190.0 1396.0,190.0 1396.0,335.0 1376.0,335.0" fill="#1f77b4"/>
+  <polygon points="1352.0,335.0 1420.0,335.0 1386.0,287.0" fill="#1f77b4"/>
+  <polygon points="725.0,763.0 725.0,743.0 1235.0,741.0 1235.0,761.0" fill="#ff7f0e"/>
+  <polygon points="1235.1,787.0 1234.9,715.0 1187.0,751.2" fill="#ff7f0e"/>
+  <polygon points="1293.3,680.6 1286.7,699.4 744.7,509.4 751.3,490.6" fill="#ff7f0e"/>
+  <polygon points="759.9,466.0 736.1,534.0 793.3,515.9" fill="#ff7f0e"/>
+  <line x1="1275" y1="698" x2="807.0" y2="698.0" stroke="#ff7f0e" stroke-width="2.5" stroke-dasharray="5,4"/>
+  <polygon points="807.0,683.0 807.0,713.0 837.0,698.0" fill="#ff7f0e"/>
+  <line x1="750" y1="690" x2="1230.0" y2="472.0" stroke="#ff7f0e" stroke-width="2.5" stroke-dasharray="5,4"/>
+  <polygon points="1236.2,485.7 1223.8,458.3 1202.7,484.4" fill="#ff7f0e"/>
+  <polygon points="702.0,650.0 682.0,650.0 682.0,534.0 702.0,534.0" fill="#ff7f0e"/>
+  <polygon points="726.0,534.0 658.0,534.0 692.0,582.0" fill="#ff7f0e"/>
+  <polygon points="1382.0,650.0 1362.0,650.0 1362.0,520.0 1382.0,520.0" fill="#ff7f0e"/>
+  <polygon points="1406.0,520.0 1338.0,520.0 1372.0,568.0" fill="#ff7f0e"/>
+  <!-- inhibitory stems -->
+  <rect x="632" y="268" width="12" height="130" fill="#8c8c8c"/><circle cx="638" cy="274" r="25" fill="#8c8c8c"/>
+  <rect x="628" y="478" width="12" height="110" fill="#8c8c8c"/><circle cx="632" cy="596" r="25" fill="#8c8c8c"/>
+  <rect x="1310" y="262" width="12" height="130" fill="#8c8c8c"/><circle cx="1316" cy="266" r="25" fill="#8c8c8c"/>
+  <rect x="1306" y="472" width="12" height="110" fill="#8c8c8c"/><circle cx="1311" cy="586" r="25" fill="#8c8c8c"/>
+    <!-- recurrent J_s loops -->
+  <path d="M 561.5,110.2 A 52,52 0 1 0 561.5,189.8" fill="none" stroke="#1f77b4" stroke-width="12"/>
+  <polygon points="573.7,204.4 549.3,175.3 543.1,205.3" fill="#1f77b4"/>
+  <text x="528.1" y="162.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">i</tspan></text>
+  <path d="M 571.8,678.2 A 52,52 0 1 0 571.8,757.8" fill="none" stroke="#ff7f0e" stroke-width="12"/>
+  <polygon points="584.0,772.4 559.6,743.3 553.4,773.3" fill="#ff7f0e"/>
+  <text x="538.3" y="730.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">i</tspan></text>
+  <path d="M 1458.6,100.2 A 52,52 0 1 1 1458.6,179.8" fill="none" stroke="#1f77b4" stroke-width="12"/>
+  <polygon points="1470.8,165.3 1446.3,194.4 1476.9,195.3" fill="#1f77b4"/>
+  <text x="1492.0" y="152.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">j</tspan></text>
+  <path d="M 1468.7,672.2 A 52,52 0 1 1 1468.7,751.8" fill="none" stroke="#ff7f0e" stroke-width="12"/>
+  <polygon points="1480.9,737.3 1456.5,766.4 1487.1,767.3" fill="#ff7f0e"/>
+  <text x="1502.2" y="724.0" text-anchor="middle" font-size="40" font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="26" dy="6">j</tspan></text>
+    <!-- area labels -->
+  <g font-weight="bold" font-size="44" fill="#000" text-anchor="middle">
+    <text x="675" y="-14">Area i</text>
+    <text x="1348" y="-14">Area j</text>
+  </g>
+  <!-- G labels -->
+  <g font-style="italic" font-weight="bold" font-size="64" fill="#000" text-anchor="middle">
+    <text x="1010" y="92">G</text>
+  </g>
+</svg>
