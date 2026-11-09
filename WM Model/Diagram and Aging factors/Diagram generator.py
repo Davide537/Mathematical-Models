@@ -119,9 +119,17 @@ def recurrent(cx, cy, rx, ry, color, side,sub):
             f'fill="none" stroke="{color}" stroke-width="{RECUR_W}"/>')
     head = f'<polygon points="{b1[0]:.1f},{b1[1]:.1f} {b2[0]:.1f},{b2[1]:.1f} {tx:.1f},{ty:.1f}" fill="{color}"/>'
     if color != INHIB:
-      label = (f'<text x="{ccx:.1f}" y="{cy + LABEL_SIZE * 0.3:.1f}" text-anchor="middle" font-size="{LABEL_SIZE}" '
-             f'font-style="italic" font-weight="bold" fill="#000">J<tspan font-size="{LABEL_SIZE*0.65:.0f}" dy="6">{sub}</tspan></text>')
-    else: label=''
+        sub_size = LABEL_SIZE * 0.65
+        jx = ccx - 4                      # nudge so "J_sub" stays visually centred
+        y0 = cy + LABEL_SIZE * 0.3
+        label = (
+            f'<text x="{jx:.1f}" y="{y0:.1f}" text-anchor="end" font-size="{LABEL_SIZE}" '
+            f'font-style="italic" font-weight="bold" fill="#000">J</text>\n  '
+            f'<text x="{jx + 1:.1f}" y="{y0 + 6:.1f}" text-anchor="start" font-size="{sub_size:.0f}" '
+            f'font-style="italic" font-weight="bold" fill="#000">{sub}</text>'
+        )
+    else:
+        label = ''
 
     return "\n  ".join([path, head, label])
 
