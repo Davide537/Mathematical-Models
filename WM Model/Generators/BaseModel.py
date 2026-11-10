@@ -119,7 +119,7 @@ class BuildModel:
             raise Exception("Aging factor naming error")
         
         ######## ANATOMICAL DATA #########
-        subgraph_data = sio.loadmat('data/subgraphData30.mat')
+        subgraph_data = sio.loadmat('../data/subgraphData30.mat')
         fln = subgraph_data['fln']  # FLN (fraction of labelled neurons)
         sln = subgraph_data['sln']  # SLN (supragranular layered neurons)
 
@@ -308,7 +308,7 @@ class BuildModel:
             W_E_eff *= D[:, np.newaxis]
             W_I_eff *= D[:, np.newaxis]
 
-        np.fill_diagonal(W_E_eff, self.g_E_self)  # include self population weights in effective connectivity matrix
+        np.fill_diagonal(W_E_eff, self.g_E_self)  # include regular local weights back into connectivity matrix
         np.fill_diagonal(W_I_eff, self.g_I_E)
 
         # Construct joint connectivity matrix for all 3 populations (E1, E2, and I)
@@ -770,7 +770,5 @@ class BuildModel:
 
 # mech = {'spine','FI'}
 
-# kk = 0.4
-# B = BuildModel(J_max=kk,Jcrit=None)
-# B.con_matrix()
+
 # B.runsim()

@@ -95,7 +95,8 @@ class Analytical_Search(bm.BuildModel):
         plt.savefig(f'Fig/phase_portrait_{Js}.svg', dpi=150, bbox_inches='tight')      
         return ax
 
-    def fixedpoint_computation(self, Js, grid_pts=10, tol=1e-4, area='9/46d'):
+    def fixedpoint_computation(self, Js, grid_pts=10, tol=1e-4, area='9/46d', I_ext=0.0):
+    
         i = self.idx(area)
         J_IE = self._compute_J_IE(Js)
 
@@ -103,7 +104,8 @@ class Analytical_Search(bm.BuildModel):
             Js += (Js - self.g_E_self_min) * (self.D[i].item() - 1)
 
         # Assemble vectors and matrices
-        I0 = np.array([self.I0_E, self.I0_E, self.I0_I])
+        # I0 = np.array([self.I0_E, self.I0_E, self.I0_I])
+        I0 = np.array([self.I0_E + I_ext, self.I0_E + I_ext, self.I0_I])   # TODO this might be wrong
         Tinv = np.diag((1/self.tau_NMDA, 1/self.tau_NMDA, 1/self.tau_GABA))
         J = np.array([[ Js,    self.g_E_cross,    self.g_E_I],
                       [ self.g_E_cross,    Js,    self.g_E_I],
@@ -294,3 +296,28 @@ def grid_gen(mech={'FI', 'spine'}):
         for age, j_max, G in tasks)
 
     return pd.DataFrame(rows)
+
+from joblib import Parallel, delayed
+
+# 0 = monostable (symmetric only), 1 = bistable (both), 2 = competition (asymmetric only), 3 = no stable FP found
+def classify(S, E, tol=1e-3):
+    sym = asym = False
+    for s, e in zip(S, E):
+        if not np.all(e.real < 0):
+            continue
+        if abs(s[0] - s[1]) < tol: sym = True
+        else: asym = True
+    return {(True, False): 0, (True, True): 1, (False, True): 2}.get((sym, asym), 3)
+
+def point(model, Js, I_ext, area):
+    S, R, E = model.fixedpoint_computation(Js, grid_pts=6, area=area, I_ext=I_ext)
+    return classify(S, E)
+
+def state_diagram(age='Y', mech={'FI', 'spine'}, area='9/46d',
+                  Js_range=(0.25, 1), I_range=(-0.05, 0.25), n=40):
+    model = Analytical_Search(aging_mechanism=mech, age=age)
+    Js_vals = np.linspace(*Js_range, n)
+    I_vals = np.linspace(*I_range, n)
+    flat = Parallel(n_jobs=-2)(delayed(point)(model, J, I, area)
+                               for J in Js_vals for I in I_vals)
+    return Js_vals, I_vals, np.array(flat).reshape(n, n)   # [Js, I_ext]
