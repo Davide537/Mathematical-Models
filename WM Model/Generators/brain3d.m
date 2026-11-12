@@ -9,7 +9,7 @@ if nargin < 4 || isempty(out_filename)
     out_filename = sprintf('Fig/3dBrain/brain3d_%s.png', datestr(now,'mmdd_HHMMSS'));
 end
 
-load('data/scalablebrainatlasdata.mat')
+load('C:\Users\david\OneDrive\Documenti\GitHub\Mathematical Models\WM Model\data\scalablebrainatlasdata.mat')
 fig = figure('visible','off', 'Color','w');
 ax = axes('Parent', fig);
 set(ax, 'Color', 'w')

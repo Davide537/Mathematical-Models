@@ -10,6 +10,8 @@ import pandas as pd
 from joblib import Parallel, delayed
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
+from pathlib import Path
+DATA_DIR = Path(r"C:\Users\david\OneDrive\Documenti\GitHub\Mathematical Models\WM Model\data")
 
 # Base Case: Heat maps
 def _format_condition_suffix(inhi, distract, lesion):
@@ -50,7 +52,7 @@ def _run_one(age, J_max, G, mech, trials,
 
     suffix = _format_condition_suffix(inhi, distract, lesion)
     key = f"{age}_J{J_max:.2f}_G{G:.2f}{suffix}"
-    tmp_path = f"../data/tmp/{key}_{mech}.npy"
+    tmp_path = DATA_DIR / f"tmp/{key}_{mech}.npy"
     np.save(tmp_path, B.R)
     return {'Age': age, 'G': G, 'J_max': J_max, 'tmp_path': tmp_path,
             'inhi': inhi, 'distract': distract, 'lesion': lesion, 'suffix': suffix}
@@ -90,7 +92,7 @@ def Heatmap_gen(trials=100, mech={'FI', 'spine'}, n_jobs=-1,
     inhi: [start(s), end(s), strength(nA), area(s)] — leave areas=None for no inhibition (default/base case)
     lesion: [perm(bool), area(s)] — leave area(s)=None for no lesion (default/base case)
     """
-    os.makedirs('../data/tmp', exist_ok=True)
+    os.makedirs(DATA_DIR /'tmp', exist_ok=True)
 
     ages    = ['Y', 'MA', 'A']
     j_maxes = [round(i * 0.01 + 0.21, 2) for i in range(31)]
@@ -106,7 +108,7 @@ def Heatmap_gen(trials=100, mech={'FI', 'spine'}, n_jobs=-1,
     print('Merging the files')
     mech_str = '_'.join(mech) if isinstance(mech, set) else mech
     cond_suffix = _format_condition_suffix(inhi, distract, lesion)
-    h5_path = f'../data/heatmap_R_{mech_str}{cond_suffix}_{Jcrit}.h5'
+    h5_path = DATA_DIR /f'heatmap_R_{mech_str}{cond_suffix}_{Jcrit}.h5'
     merge_to_hdf5(rows, h5_path)
     print(f"R saved to {h5_path}")
 
@@ -274,11 +276,11 @@ def Plot_Heatmaps(mech, metric='mean', comb_plot=True,
     cfg      = METRIC_CFG[metric]
     mech_str = '_'.join(mech) if isinstance(mech, set) else mech
     cond_suffix = _format_condition_suffix(inhi, distract, lesion)
-    h5_path  = f'../data/heatmap_R_{mech_str}{cond_suffix}_{Jcrit}.h5'
+    h5_path  = DATA_DIR / f'heatmap_R_{mech_str}{cond_suffix}_{Jcrit}.h5'
 
     if diff:
         base_suffix = _format_condition_suffix([9, 9.5, 0.3, None], [9, 9.5, 0], [False, None])
-        h5_path_base = f'../data/heatmap_R_{mech_str}{base_suffix}.h5'
+        h5_path_base = DATA_DIR / f'heatmap_R_{mech_str}{base_suffix}.h5'
 
     marked_pairs = [(0.468, 0.21), (0.26, 0.48), (0.23, 0.5)]
     full_ages    = {'Y': 'Young', 'MA': 'Middle Aged', 'A': 'Aged'}
@@ -446,7 +448,7 @@ def plot_cortical_map_overlay(mech,J_max,G,
     age_jitter = {'Y': 0, 'MA': 0.01, 'A': 0.02}
     mech_str = '_'.join(mech) if isinstance(mech, set) else mech
     cond_suffix = _format_condition_suffix(inhi, distract, lesion)
-    h5_path  = f'../data/heatmap_R_{mech_str}{cond_suffix}.h5'
+    h5_path  = DATA_DIR/ f'heatmap_R_{mech_str}{cond_suffix}.h5'
     title_suffix = f" ({condition_label})" if condition_label else ""
 
     ages      = ['Y', 'MA', 'A']

@@ -4,6 +4,8 @@ import os
 # Must be set BEFORE importing numpy
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
+from pathlib import Path
+DATA_DIR = Path(r"C:\Users\david\OneDrive\Documenti\GitHub\Mathematical Models\WM Model\data")
 
 # --- Third-party ---
 import matlab.engine
@@ -17,7 +19,7 @@ from scipy.optimize import brentq, curve_fit
 
 def aging_a_e(perc):
     # ── Data ─────────────────────────────────────────────────────────────
-    full_df = pd.read_excel("data/EPHYS_Aver_byMonkey.xlsx")
+    full_df = pd.read_excel(DATA_DIR / "EPHYS_Aver_byMonkey.xlsx")
     df = full_df.iloc[:, 14:22].copy()  # Only look at the FI and rheobase data
     rb = full_df[['Age Group', 'rheobase']].copy()
 
@@ -119,7 +121,7 @@ class BuildModel:
             raise Exception("Aging factor naming error")
         
         ######## ANATOMICAL DATA #########
-        subgraph_data = sio.loadmat('../data/subgraphData30.mat')
+        subgraph_data = sio.loadmat(DATA_DIR / "subgraphData30.mat")
         fln = subgraph_data['fln']  # FLN (fraction of labelled neurons)
         sln = subgraph_data['sln']  # SLN (supragranular layered neurons)
 
@@ -710,11 +712,20 @@ class BuildModel:
         perm = np.concatenate([self.cort_order, self.cort_order + k])  # E1 block, then E2 block
         R = self.R[:, :2*k][:, perm]           # (timestep, 60 cortical-order columns, trial)
         R = np.transpose(R, (2, 0, 1))         # (trial, timestep, areas)
+        # eng = matlab.engine.start_matlab("-nodesktop -nosplash -nodisplay")
+        # # mrate = matlab.single(R.tolist())
+        # mrate = matlab.single(np.ascontiguousarray(R), size=R.shape)
+        # eng.brain3d(mrate, all_areas, nargout=0)
+        # eng.quit()
+        # pass
+
         eng = matlab.engine.start_matlab("-nodesktop -nosplash -nodisplay")
-        mrate = matlab.double(R.tolist())
+        mat_dir = r"C:/Users/david/OneDrive/Documenti/GitHub/Mathematical Models/WM Model/Generators"
+        eng.addpath(eng.genpath(mat_dir), nargout=0)
+        assert eng.exist('brain3d', nargout=1) in (2, 6), "brain3d not found on MATLAB path"
+        mrate = matlab.single(R.tolist())
         eng.brain3d(mrate, all_areas, nargout=0)
         eng.quit()
-        pass
 
     def cortical_map(self, rates=None):
         if rates is not None:
@@ -769,6 +780,3 @@ class BuildModel:
         pass
 
 # mech = {'spine','FI'}
-
-
-# B.runsim()
