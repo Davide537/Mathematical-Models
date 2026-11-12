@@ -57,7 +57,6 @@ camlight(ax,-180,25);
 camlight(ax,-120,0);
 camlight(ax,-50,-20);
 view(ax,-90,0);
-
 set(ax,'CLim',[0.3 50]);  % fixed scale — critical for a consistent GIF
 
 if all_areas
