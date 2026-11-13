@@ -721,6 +721,19 @@ class BuildModel:
         eng.quit()
         pass
 
+    def brain3d_conn(self, conn=None, out_filename="Fig/3dBrain/conn.png", **opts):
+        if conn is None:
+            conn = self.W_eff[:self.num_areas, :self.num_areas]   # E1->E1 block, hierarchy order (adjust to your matrix)
+        conn = np.asarray(conn, dtype=float)
+        conn = conn[np.ix_(self.cort_order, self.cort_order)]  # to MATLAB's area_list order
+
+        eng = matlab.engine.start_matlab("-nodesktop -nosplash -nodisplay")
+        mat_dir = r"C:/Users/david/OneDrive/Documenti/GitHub/Mathematical Models/WM Model/Generators"
+        eng.addpath(eng.genpath(mat_dir), nargout=0)
+        eng.brain3d_conn(matlab.double(conn.tolist()), out_filename, opts, nargout=0)
+        eng.quit()
+        pass
+    
     def cortical_map(self, rates=None):
         if rates is not None:
             self.R = rates
