@@ -44,9 +44,8 @@ def _run_one(age, J_max, G, mech, trials,
              stim=[4, 4.5, 3, 'V1'],
              inhi=[9, 9.5, 0.3, None],
              distract=[9, 9.5, 0],
-             lesion=[False, None],
-             Jcrit='cutFB'):
-    B = bm.BuildModel(J_max=J_max, G=G, aging_mechanism=mech, age=age, Jcrit=Jcrit)
+             lesion=[False, None]):
+    B = bm.BuildModel(J_max=J_max, G=G, aging_mechanism=mech, age=age)
     B.runsim(stim=stim, inhi=inhi, distract=distract, lesion=lesion,
              trials=trials, trial_length=20, save_fac=10)
 
@@ -86,7 +85,7 @@ def merge_to_hdf5(rows, h5_path):
             os.remove(row['tmp_path'])  # clean up
 
 def Heatmap_gen(trials=100, mech={'FI', 'spine'}, n_jobs=-1,
-                 inhi=[9, 9.5, 0.3, None], lesion=[False, None], distract=[9, 9.5, 0], Jcrit='cutFB'):
+                 inhi=[9, 9.5, 0.3, None], lesion=[False, None], distract=[9, 9.5, 0]):
     """
     n_jobs: -1 = use all cores, -2 = all cores minus one, 8 = exactly 8, etc.
     inhi: [start(s), end(s), strength(nA), area(s)] — leave areas=None for no inhibition (default/base case)
@@ -101,14 +100,14 @@ def Heatmap_gen(trials=100, mech={'FI', 'spine'}, n_jobs=-1,
     tasks = list(product(ages, j_maxes, Gs))   # 1488 combinations
     print(f"Total tasks: {len(tasks)}")
     rows = Parallel(n_jobs=n_jobs, verbose=10, backend='loky')(
-        delayed(_run_one)(age, j_max, G, mech, trials, inhi=inhi, lesion=lesion, distract=distract, Jcrit=Jcrit)
+        delayed(_run_one)(age, j_max, G, mech, trials, inhi=inhi, lesion=lesion, distract=distract)
         for age, j_max, G in tasks)
 
     # Merge all tmp .npy files into one HDF5
     print('Merging the files')
     mech_str = '_'.join(mech) if isinstance(mech, set) else mech
     cond_suffix = _format_condition_suffix(inhi, distract, lesion)
-    h5_path = DATA_DIR /f'heatmap_R_{mech_str}{cond_suffix}_{Jcrit}.h5'
+    h5_path = DATA_DIR /f'heatmap_R_{mech_str}{cond_suffix}.h5'
     merge_to_hdf5(rows, h5_path)
     print(f"R saved to {h5_path}")
 
@@ -271,12 +270,12 @@ def Plot_Heatmaps(mech, metric='mean', comb_plot=True,
                    distract=[9, 9.5, 0],
                    lesion=[False, None],
                    condition_label=None,
-                   diff=False, Jcrit='cutFB'):
+                   diff=False):
 
     cfg      = METRIC_CFG[metric]
     mech_str = '_'.join(mech) if isinstance(mech, set) else mech
     cond_suffix = _format_condition_suffix(inhi, distract, lesion)
-    h5_path  = DATA_DIR / f'heatmap_R_{mech_str}{cond_suffix}_{Jcrit}.h5'
+    h5_path  = DATA_DIR / f'heatmap_R_{mech_str}{cond_suffix}.h5'
 
     if diff:
         base_suffix = _format_condition_suffix([9, 9.5, 0.3, None], [9, 9.5, 0], [False, None])
@@ -287,11 +286,11 @@ def Plot_Heatmaps(mech, metric='mean', comb_plot=True,
     full_mech    = {
             'spine':                'Local Spine Loss Aging Mechanism',
             'FI':                   'Neuronal Hyperexcitability Aging Mechanism',
-            'longrange':            'Long-range Spine Loss Aging Mechanism',
+            'LG':            'Long-range Spine Loss Aging Mechanism',
             frozenset({'spine','FI'}) :              'Both Aging Mechanisms',
-            frozenset({'spine','longrange'}) :       'Spine Loss Aging Mechanisms',
-            frozenset({'longrange','FI'}) :          'Both Aging Mechanisms',
-            frozenset({'spine','FI','longrange'}) :  'Three Aging Mechanisms'
+            frozenset({'spine','LG'}) :       'Spine Loss Aging Mechanisms',
+            frozenset({'LG','FI'}) :          'Both Aging Mechanisms',
+            frozenset({'spine','FI','LG'}) :  'Three Aging Mechanisms'
             }
     if type(mech) == set:
         mech = frozenset(mech)
@@ -428,7 +427,7 @@ def Plot_Heatmaps(mech, metric='mean', comb_plot=True,
             cbar.set_ticks(np.linspace(cfg['vmin'], cfg['vmax'], 5))
         cbar.set_label(metric_label)
         prefix = 'heatmaps_diff' if diff else 'heatmaps'
-        plt.savefig(f'../Fig/Heatmaps/{prefix}_{mech_str}_{metric}{cond_suffix}_{Jcrit}.svg',
+        plt.savefig(f'../Fig/Heatmaps/{prefix}_{mech_str}_{metric}{cond_suffix}.svg',
                      dpi=150, bbox_inches='tight')
         plt.show()
 

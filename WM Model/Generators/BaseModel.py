@@ -23,7 +23,7 @@ def aging_a_e(perc):
     df = full_df.iloc[:, 14:22].copy()  # Only look at the FI and rheobase data
     rb = full_df[['Age Group', 'rheobase']].copy()
 
-    age_order = ["Y", "MA", "Aged"]
+    age_order = ["Y", "MA", "A"]
 
     # Split into ages, averaging
     df["Age Group"] = pd.Categorical(full_df["Age Group"], categories=age_order, ordered=True)
@@ -65,7 +65,7 @@ def aging_a_e(perc):
     # ── Fit ──────────────────────────────────────────────────────────────
     results = {"Y": {"a": a_Y, "b": b_Y, "label": "Young"}}
 
-    for g in ["MA", "Aged"]:
+    for g in ["MA", "A"]:
         # Compute percent change for MA and A with Y as baseline
         pct_fi = np.mean((group_mean.loc[g].values - young_fi) / young_fi * 100)
         pct_rheo = (rheo_mean.loc[g].values.squeeze() - young_rheo) / young_rheo * 100
@@ -117,7 +117,7 @@ class BuildModel:
     
         if aging_mechanism == None:
             aging_mechanism = set()
-        elif 'FI' not in aging_mechanism and 'spine' not in aging_mechanism and 'longrange' not in aging_mechanism:
+        elif 'FI' not in aging_mechanism and 'spine' not in aging_mechanism and 'LG' not in aging_mechanism:
             raise Exception("Aging factor naming error")
         
         ######## ANATOMICAL DATA #########
@@ -211,6 +211,7 @@ class BuildModel:
         self.r0_I = 5.5  # Hz
 
         if 'FI' in aging_mechanism:
+# TODO compute perc = 1 values and plug them here
             a_E_by_age = {
                         'Y': 135 * np.ones(self.num_areas),
                         'MA': np.linspace(135.5, 139.74557063887, self.num_areas),
@@ -294,7 +295,7 @@ class BuildModel:
         LR_IE_gradient = self.g_I_E / np.max(self.g_I_E)
         W_I_eff = mu_IE * LR_IE_gradient[:, np.newaxis] * W_I 
 
-        if 'longrange' in aging_mechanism:
+        if 'LG' in aging_mechanism:
             # affects both excitatory and inhibitory , TODO?
             D_by_age = {
                 'Y': np.ones_like(self.hierarchy),
@@ -308,7 +309,7 @@ class BuildModel:
                 raise ValueError(f"Unknown age: {age}")
 
             W_E_eff *= D[:, np.newaxis]
-            W_I_eff *= D[:, np.newaxis]
+            # W_I_eff *= D[:, np.newaxis] TODO: replace this
 
         np.fill_diagonal(W_E_eff, self.g_E_self)  # include regular local weights back into connectivity matrix
         np.fill_diagonal(W_I_eff, self.g_I_E)
