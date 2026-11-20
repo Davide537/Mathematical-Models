@@ -296,7 +296,6 @@ class BuildModel:
         W_I_eff = mu_IE * LR_IE_gradient[:, np.newaxis] * W_I 
 
         if 'LG' in aging_mechanism:
-            # affects both excitatory and inhibitory , TODO?
             D_by_age = {
                 'Y': np.ones_like(self.hierarchy),
                 'MA': 0.825 - 0.009 * np.arange(self.num_areas),
@@ -309,7 +308,7 @@ class BuildModel:
                 raise ValueError(f"Unknown age: {age}")
 
             W_E_eff *= D[:, np.newaxis]
-            # W_I_eff *= D[:, np.newaxis] TODO: replace this
+            W_I_eff *= D[:, np.newaxis]
 
         np.fill_diagonal(W_E_eff, self.g_E_self)  # include regular local weights back into connectivity matrix
         np.fill_diagonal(W_I_eff, self.g_I_E)
@@ -384,7 +383,7 @@ class BuildModel:
 
     def runsim(self, stim=[4, 4.5, 0.3, 'V1'], distract=[3.5, 4, 0], inhi=[9, 9.5, 0.3, None],
             trial_length=10, lesion=[False, None], trials=1, save_fac=1,
-            store_S=False, seed=None, dtype=np.float32):
+            store_S=False, seed=None, dtype=np.float32, I_ext=0.0):
         # Stim/distract.inhi: [start (s), end (s), strenght (nA), area(s) ] of stimulus or distractor or inhibition
         # Lesioned areas    [Bool perm [switch on and off], list lesioned area(s)]
 
@@ -410,7 +409,7 @@ class BuildModel:
         self.trials = trials  # number of trials computed at the same time with same parameters
         ####### EXT INPUTS AND NOISE ########
 
-        I0 = np.concatenate((self.I0_E * np.ones(k2), self.I0_I * np.ones(k)))
+        I0 = np.concatenate((self.I0_E * np.ones(k2) + I_ext, self.I0_I * np.ones(k)))
         I0 = np.ascontiguousarray(np.repeat(I0[:, None], self.trials, axis=1), dtype=f)  # (90, trials)
 
         # Let's apply external stimulation to some area populations E1 & E2
@@ -712,8 +711,7 @@ class BuildModel:
         k = self.num_areas
         perm = np.concatenate([self.cort_order, self.cort_order + k])  # E1 block, then E2 block
         R = self.R[:, :2*k][:, perm]           # (timestep, 60 cortical-order columns, trial)
-        R = np.transpose(R, (2, 0, 1))         # (trial, timestep, areas)
-
+        R = np.transpose(R, (2, 0, 1))         # (trial, timestep, areas)        
         eng = matlab.engine.start_matlab("-nodesktop -nosplash -nodisplay")
         mat_dir = r"C:/Users/david/OneDrive/Documenti/GitHub/Mathematical Models/WM Model/Generators"
         eng.addpath(eng.genpath(mat_dir), nargout=0)

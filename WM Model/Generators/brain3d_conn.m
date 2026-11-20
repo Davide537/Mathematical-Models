@@ -4,7 +4,7 @@ function [] = brain3d_conn(conn, out_filename, opts)
 %                      .node_size (marker area, pt^2) .font_size .cam_push .pin_file
 
 if nargin < 2 || isempty(out_filename)
-    out_filename = sprintf('Fig/3dBrain/brain3d_conn_%s.png', datestr(now,'mmdd_HHMMSS'));
+    out_filename = sprintf('Fig/3dBrain/brain3d_conn_%s.svg', datestr(now,'mmdd_HHMMSS'));
 end
 if nargin < 3, opts = struct(); end
 
