@@ -96,74 +96,67 @@ class Analytical_Search(bm.BuildModel):
         return ax
 
     def fixedpoint_computation(self, Js, grid_pts=10, tol=1e-4, area='9/46d', I_ext=0.0):
-    
         i = self.idx(area)
         J_IE = self._compute_J_IE(Js)
-
         if 'spine' in self.aging_mechanism:
-            Js += (Js - self.g_E_self_min) * (self.D[i].item() - 1)
+            Js = Js + (Js - self.g_E_self_min) * (self.D[i].item() - 1)
 
-        # Assemble vectors and matrices
-        # I0 = np.array([self.I0_E, self.I0_E, self.I0_I])
         I0 = np.array([self.I0_E + I_ext, self.I0_E + I_ext, self.I0_I])
-        Tinv = np.diag((1/self.tau_NMDA, 1/self.tau_NMDA, 1/self.tau_GABA))
-        J = np.array([[ Js,    self.g_E_cross,    self.g_E_I],
-                      [ self.g_E_cross,    Js,    self.g_E_I],
-                      [ J_IE,  J_IE,  self.g_I_I]])
-        # Assemble vector functions
-        def I_fn(S):
-            return J@S + I0
-
-        def Gamma(S):
-            return np.array([self.gamma*(1 - S[0]), self.gamma*(1 - S[1]), self.gamma_i])
+        J = np.array([[Js,             self.g_E_cross, self.g_E_I],
+                    [self.g_E_cross, Js,             self.g_E_I],
+                    [J_IE,           J_IE,           self.g_I_I]])
+        Tinv = np.diag([1/self.tau_NMDA, 1/self.tau_NMDA, 1/self.tau_GABA])
+        aE, bE, dE = self.a_E[i], self.b_E, self.d_E
+        gt, git = self.gamma*self.tau_NMDA, self.gamma_i*self.tau_GABA
 
         def Phi(I):
-            return np.array([phi_E(I[0], self.a_E[i], self.b_E, self.d_E)[0,0], 
-                             phi_E(I[1], self.a_E[i], self.b_E, self.d_E)[1,0],
-                             phi_I(I[2], self.g_I, self.c_1, self.c_0, self.r0_I) ])
-        
-        def phiE_prime(I,a,b,d):
-            x = a*I - b
-            e = np.exp(np.clip(-d*x, -700, 350))
-            num = 1 - e - d*x*e
-            den = (1 - e)**2
-            return a*num/den
-
-        def phiI_prime(I, gI, c1, c0, r0):
-            return (c1/gI) if (c1*I - c0)/gI + r0 > 0 else 0.0
+            return np.array([phi_E(I[0], aE, bE, dE)[0, 0],
+                            phi_E(I[1], aE, bE, dE)[1, 0],
+                            phi_I(I[2], self.g_I, self.c_1, self.c_0, self.r0_I)])
 
         def Phi_deriv(I):
-            return np.hstack( (phiE_prime(I[0], self.a_E[i], self.b_E, self.d_E), 
-                            phiE_prime(I[1], self.a_E[i], self.b_E, self.d_E) , 
-                            phiI_prime(I[2], self.g_I, self.c_1, self.c_0, self.r0_I) ) )
+            x = aE*I[:2] - bE
+            e = np.exp(np.clip(-dE*x, -700, 350))
+            with np.errstate(invalid='ignore', divide='ignore'):
+                dE_ = aE*(1 - e - dE*x*e)/(1 - e)**2
+            dE_ = np.where(np.abs(x) < 1e-8, aE/2, dE_)      # limit at x=0
+            active = (self.c_1*I[2] - self.c_0)/self.g_I + self.r0_I > 0
+            return np.array([*dE_, self.c_1/self.g_I if active else 0.0])
 
-        # The function to solve
-        def F(S):
-            return - Tinv @ S + Gamma(S) * Phi(I_fn(S))
+        def S_of_R(R):
+            return np.array([gt*R[0]/(1 + gt*R[0]), gt*R[1]/(1 + gt*R[1]), git*R[2]])
 
-        x0 = np.zeros(3)
-        # Jacobian of F(S)
-        def Jac(S):
-            D_sat = np.diag( (self.gamma*Phi(I_fn(S))[0], self.gamma*Phi(I_fn(S))[1], 0)) 
-            return -Tinv - D_sat + ( Gamma(S) * Phi_deriv(I_fn(S)) )[:, None]* J
+        def H(R):
+            return Phi(J @ S_of_R(R) + I0) - R
 
-        # Multi-start over a grid of initial conditions
-        grid = np.linspace(0.01, 0.9, grid_pts)
-        solutions = []; R = []; 
-        eig = []
-        for sa0 in grid:
-            for sb0 in grid:
-                sc0 = 0.15
-                x0 = np.array([sa0, sb0, sc0])
-                sol = scipy.optimize.root(F, x0, jac=Jac, method='hybr')
-                if sol.success:
-                    S = sol.x
-                    if np.all(S > -1e-6) and np.all(S < 1.5):
-                        if not any(np.max(np.abs(S - prev)) < tol for prev in solutions):
-                            solutions.append(S); R.append(Phi(I_fn(S)))
-                            eigval = np.linalg.eigvals(Jac(S))
-                            eig.append(eigval)
+        def JacH(R):
+            dS = np.array([gt/(1 + gt*R[0])**2, gt/(1 + gt*R[1])**2, git])
+            return Phi_deriv(J @ S_of_R(R) + I0)[:, None] * J * dS - np.eye(3)
 
+        def Jac(S):                       # S-space Jacobian, only for stability
+            I = J @ S + I0
+            Gam = np.array([self.gamma*(1 - S[0]), self.gamma*(1 - S[1]), self.gamma_i])
+            D_sat = np.diag([self.gamma*Phi(I)[0], self.gamma*Phi(I)[1], 0.0])
+            return -Tinv - D_sat + (Gam * Phi_deriv(I))[:, None] * J
+
+        # Start grid: S_E dense towards 1, mapped to rates
+        S0 = np.unique(np.concatenate([np.linspace(0, 0.8, grid_pts, endpoint=False),
+                                    1 - np.logspace(-0.7, -2.5, grid_pts)]))
+        R0 = S0 / (gt*(1 - S0))
+
+        solutions, R, eig = [], [], []
+        for ra in R0:
+            for rb in R0:
+                for sI0 in (0.05, 0.3):
+                    sol = scipy.optimize.root(H, [ra, rb, sI0/git], jac=JacH,
+                                            method='hybr', tol=1e-13)
+                    Rs = sol.x
+                    if np.any(Rs < -1e-9) or np.linalg.norm(H(Rs)) > 1e-8*(1 + np.linalg.norm(Rs)):
+                        continue                      # judge on residual, not sol.success
+                    S = S_of_R(Rs)
+                    if not any(np.max(np.abs(S - p)) < tol for p in solutions):
+                        solutions.append(S); R.append(Phi(J @ S + I0))
+                        eig.append(np.linalg.eigvals(Jac(S)))
         return solutions, R, eig
 
     def find_critical_Js(condition, area, Js_min=0.21, Js_start=0.8, Js_cap=100.0, tol=1e-4):
