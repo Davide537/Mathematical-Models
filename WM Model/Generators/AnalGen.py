@@ -15,8 +15,8 @@ def phi_I(I, g_I, c_1, c_0, r0_I):
     return np.maximum((1 / g_I) * (c_1 * I - c_0) + r0_I, 0)
 
 class Analytical_Search(bm.BuildModel):
-    def __init__(self, J_max=0.42, G=0.48, age="Y", aging_mechanism=None, perc=0.4):
-        super().__init__(J_max, G, age, aging_mechanism, perc)
+    def __init__(self, J_max=0.42, G=0.48, age="Y", aging_mechanism=None, frac=0.4):
+        super().__init__(J_max, G, age, aging_mechanism, frac)
         self.aging_mechanism = {aging_mechanism} if isinstance(aging_mechanism, str) else (aging_mechanism or set())        
         pass
     
@@ -151,8 +151,9 @@ class Analytical_Search(bm.BuildModel):
                     sol = scipy.optimize.root(H, [ra, rb, sI0/git], jac=JacH,
                                             method='hybr', tol=1e-13)
                     Rs = sol.x
-                    if np.any(Rs < -1e-9) or np.linalg.norm(H(Rs)) > 1e-8*(1 + np.linalg.norm(Rs)):
-                        continue                      # judge on residual, not sol.success
+                    res = np.linalg.norm(H(Rs))
+                    if not (np.all(np.isfinite(Rs)) and np.all(Rs >= -1e-9) and res <= 1e-8*(1 + np.linalg.norm(Rs))):
+                        continue
                     S = S_of_R(Rs)
                     if not any(np.max(np.abs(S - p)) < tol for p in solutions):
                         solutions.append(S); R.append(Phi(J @ S + I0))

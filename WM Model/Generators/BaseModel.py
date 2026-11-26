@@ -17,12 +17,12 @@ import scipy.io as sio
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.optimize import brentq, curve_fit
 
-def aging_a_e(perc):
+def aging_a_e(frac):
     # ── Data ─────────────────────────────────────────────────────────────
     full_df = pd.read_excel(DATA_DIR / "EPHYS_Aver_byMonkey.xlsx")
+    full_df["Age Group"] = full_df["Age Group"].replace({"Aged": "A"})
     df = full_df.iloc[:, 14:22].copy()  # Only look at the FI and rheobase data
     rb = full_df[['Age Group', 'rheobase']].copy()
-
     age_order = ["Y", "MA", "A"]
 
     # Split into ages, averaging
@@ -63,7 +63,7 @@ def aging_a_e(perc):
     y_young = phi_E(xc, a_Y, b_Y)
 
     # ── Fit ──────────────────────────────────────────────────────────────
-    results = {"Y": {"a": a_Y, "b": b_Y, "label": "Young"}}
+    results = {"Y": {"a": a_Y, "b": b_Y}}
 
     for g in ["MA", "A"]:
         # Compute percent change for MA and A with Y as baseline
@@ -71,9 +71,9 @@ def aging_a_e(perc):
         pct_rheo = (rheo_mean.loc[g].values.squeeze() - young_rheo) / young_rheo * 100
 
         # Define the target values of the curves and rheobase with MA and A aging
-        y_target = y_young * (1 + pct_fi * perc/ 100)
+        y_target = y_young * (1 + pct_fi * frac/ 100)
         # print(y_target)
-        target_rheo = I_rheo_Y * (1 + pct_rheo * perc / 100)
+        target_rheo = I_rheo_Y * (1 + pct_rheo * frac / 100)
 
         # (starting guess)
         a0 = a_Y * (1 + pct_fi / 100)
@@ -113,7 +113,7 @@ def aging_a_e(perc):
     return results
 
 class BuildModel:
-    def __init__(self, J_max = 0.42, G = 0.48, age = "Y", aging_mechanism = None, Jcrit='cutFB', ALPHA=1):
+    def __init__(self, J_max = 0.42, G = 0.48, age = "Y", aging_mechanism = None, Jcrit='cutFB', ALPHA=1, frac=0.4):
     
         if aging_mechanism == None:
             aging_mechanism = set()
@@ -211,12 +211,22 @@ class BuildModel:
         self.r0_I = 5.5  # Hz
 
         if 'FI' in aging_mechanism:
-# TODO compute perc = 1 values and plug them here
+# TODO compute frac = 1.5 values and plug them here
+# Test for multiple values, make it a parameter sadly
+            # frac:0.4
+            # a_E_by_age = {
+            #             'Y': 135 * np.ones(self.num_areas),
+            #             'MA': np.linspace(135.5, 139.74557063887, self.num_areas),
+            #             'A': np.linspace(136, 142.24143888819532, self.num_areas),
+            #             }
+
+            # frac:1
             a_E_by_age = {
                         'Y': 135 * np.ones(self.num_areas),
-                        'MA': np.linspace(135.5, 139.74557063887, self.num_areas),
-                        'A': np.linspace(136, 142.24143888819532, self.num_areas),
+                        'MA': np.linspace(135.5, 146.78210531849297, self.num_areas),
+                        'A': np.linspace(136, 152.93111856719523, self.num_areas),
                         }
+
             try:
                 self.a_E = a_E_by_age[age] # Hz/nA
 
@@ -307,8 +317,7 @@ class BuildModel:
             except KeyError:
                 raise ValueError(f"Unknown age: {age}")
 
-            W_E_eff *= D[:, np.newaxis]
-            W_I_eff *= D[:, np.newaxis]
+            W_E_eff *= D[:, np.newaxis] # only affect excitatory connections
 
         np.fill_diagonal(W_E_eff, self.g_E_self)  # include regular local weights back into connectivity matrix
         np.fill_diagonal(W_I_eff, self.g_I_E)
